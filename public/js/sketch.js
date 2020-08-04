@@ -77,6 +77,42 @@ function init(){
 	}
 
 	cssScrollSnapPolyfill()
+
+	document.body.addEventListener('touchstart',handleTouch,false)
+	document.getElementById('defaultCanvas0').addEventListener('touchstart',handleTouch,false)
+}
+let touchCount = 0
+let ongoingTouches = []
+function handleTouch(event){
+	touchCount++
+	let touches = event.changedTouches;
+
+ for (var i = 0; i < touches.length; i++) {
+
+
+    var idx = ongoingTouchIndexById(touches[i].identifier);
+
+    if (idx >= 0) {
+  
+
+	console.log('hey that is a touch : ' + touchCount + " , " + touches[i].x + "," + touches[i].y)
+    }
+  }
+
+	console.log(event.touches[0].clientX + "," + event.touches[0].clientY)
+
+	
+}
+
+function ongoingTouchIndexById(idToFind) {
+  for (var i = 0; i < ongoingTouches.length; i++) {
+    var id = ongoingTouches[i].identifier;
+    
+    if (id == idToFind) {
+      return i;
+    }
+  }
+  return -1;    // not found
 }
 
 function resize(){
@@ -101,7 +137,7 @@ function preload() {
 	}) 
 	
 	myFont = loadFont('assets/Futura-Lig.otf')
-	// openFullscreen()
+	openFullscreen()
 	init()
 
 }
@@ -421,12 +457,25 @@ class TrackedDevice{
 		this.angle = 0
 		this.sizeL = 180
 		this.thisLabel = new Label()
+		this.oldPos = createVector(0,0)
+		
 	}
 	update(){
-		this.smoothRotation = this.easeFloat(this.rotation, this.smoothRotation, 0.1)
-		this.smoothPosition.x = this.easeFloat(this.x, this.smoothPosition.x, 0.1)
-    	this.smoothPosition.y = this.easeFloat(this.y, this.smoothPosition.y, 0.1)
-    	this.angle = Math.atan2(this.smoothPosition.y - windowHeight/2, this.smoothPosition.x - windowWidth/4) * 180 / Math.PI
+		let currPos = createVector ( this.x,this.y )
+		let delta = currPos.dist(this.oldPos)
+		//let alpha = map(delta,0,windowWidth/2,0.99,0.001)
+		let alpha = 0.1
+		//if(delta > mouseX ){alpha = 0.01}else{alpha = 0.99}
+		this.smoothRotation = this.easeFloat2(this.rotation, this.smoothRotation, 0.1)
+		//this.smoothPosition.x = this.easeFloat(this.x, this.smoothPosition.x, 0.95)
+    		//this.smoothPosition.y = this.easeFloat(this.y, this.smoothPosition.y, 0.95)
+		this.smoothPosition.x = this.easeFloat2(this.x, this.smoothPosition.x, alpha)
+    		this.smoothPosition.y = this.easeFloat2(this.y, this.smoothPosition.y, alpha)
+    		//this.smoothPosition.x = this.x
+		//this.smoothPosition.y = this.y
+		this.angle = Math.atan2(this.smoothPosition.y - windowHeight/2, this.smoothPosition.x - windowWidth/4) * 180 / Math.PI
+		this.oldPos.x = this.smoothPosition.x
+		this.oldPos.y = this.smoothPosition.y
 	}
 	show(){
 		let radius = 45
@@ -486,6 +535,10 @@ class TrackedDevice{
     	const d = target - value
     	return value + (d * alpha)
   	}
+	easeFloat2 (target, value, alpha ){
+	value = value * alpha + target *(1-alpha)
+	return value
+	}
   	easeFloatCircular (target, value, maxValue, alpha = 0.1) {
     	let delta = target - value
     	const altDelta = maxValue - Math.abs(delta)
