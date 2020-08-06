@@ -41,6 +41,7 @@ let rMZ = 0
 let easycamIntialized=false
 let touchX =0, touchY = 0
 let projectPosition = 0
+let media
 /*  full screen */
 let elem = document.documentElement
 function openFullscreen() {
@@ -154,7 +155,18 @@ function preload() {
 function logScroll(e) {
 	// uncomment to log position of the scroll in console
 	projectPosition = e.target.scrollTop/windowHeight
-	console.log(projectPosition)
+
+
+	for (i = 0; i < media.length; ++i) {
+		if(projectPosition == i){
+			media[i].play()
+		}else
+  		{
+  			media[i].pause()
+  		}
+  		
+	}
+	// console.log(projectPosition)
   // console.log(`Scroll position: ${e.target.scrollTop}`)
 }
 function setup() {
@@ -172,6 +184,9 @@ function setup() {
 	document.getElementById('defaultCanvas0').addEventListener('touchstart',handleTouch,false)
 	document.getElementById('defaultCanvas0').addEventListener('touchend',handleEnd,false)
 	document.getElementById('defaultCanvas0').addEventListener('touchmove',handleMove,false)
+
+	media = document.querySelectorAll('video')
+	console.log(media.length)
 	let projects = document.getElementsByClassName('project')
 
 	Array.prototype.forEach.call(projects, function(el,index) {
