@@ -38,6 +38,8 @@ let cdmx
 let rMX = -161
 let rMY = -107
 let rMZ = 0
+let easycamIntialized=false
+let touchX =0, touchY = 0
 /*  full screen */
 let elem = document.documentElement
 function openFullscreen() {
@@ -75,34 +77,39 @@ function init(){
 		// items[i].style.background = getRandomColor()
 				items[i].style.background = "rgb(0,0,0)"
 	}
-
 	cssScrollSnapPolyfill()
-
-	document.body.addEventListener('touchstart',handleTouch,false)
-	document.getElementById('defaultCanvas0').addEventListener('touchstart',handleTouch,false)
 }
 let touchCount = 0
 let ongoingTouches = []
-function handleTouch(event){
+let isTouch = false
+function handleTouch(evt){
+	isTouch=true
 	touchCount++
-	let touches = event.changedTouches;
+	let touches = evt.changedTouches;
+	console.log("touch started at : " + evt.touches[0].clientX + " , " + evt.touches[0].clientY)
 
- for (var i = 0; i < touches.length; i++) {
-
-
-    var idx = ongoingTouchIndexById(touches[i].identifier);
-
-    if (idx >= 0) {
-  
-
-	console.log('hey that is a touch : ' + touchCount + " , " + touches[i].x + "," + touches[i].y)
-    }
-  }
-
-	console.log(event.touches[0].clientX + "," + event.touches[0].clientY)
-
+	touchX = evt.touches[0].clientX
+	touchY = evt.touches[0].clientY
 	
 }
+
+function handleEnd(evt) {
+	isTouch=false
+	console.log("touch ended at : " + evt.changedTouches[0].pageX + " , " + evt.changedTouches[0].pageY )
+	touchX = evt.changedTouches[0].pageX
+	touchY = evt.changedTouches[0].pageY
+}
+
+function handleMove(evt) {
+	 console.log("touch moved at : " + evt.changedTouches[0].pageX + " , " + evt.changedTouches[0].pageY )
+	touchX = evt.changedTouches[0].pageX
+	touchY = evt.changedTouches[0].pageY
+}
+
+
+
+
+
 
 function ongoingTouchIndexById(idToFind) {
   for (var i = 0; i < ongoingTouches.length; i++) {
@@ -146,9 +153,17 @@ function setup() {
 	canvas = createCanvas(windowWidth/2, windowHeight, WEBGL) 
 	noStroke()
 	textFont(myFont)
-	easycam = new Dw.EasyCam(this._renderer, {distance:1500, center:[0,0,0]}) 
-	easycam.setDistanceMin(100)
-	easycam.setDistanceMax(r*60)
+	if(!easycamIntialized){
+		easycam = new Dw.EasyCam(this._renderer, {distance:1500, center:[0,0,0]}) 
+		easycam.setDistanceMin(100)
+		easycam.setDistanceMax(r*60)
+		easycamIntialized=true
+	}
+	// Attaching  Touch Listeners to body and P5 JS Canvas 
+	document.body.addEventListener('touchstart',handleTouch,false)
+	document.getElementById('defaultCanvas0').addEventListener('touchstart',handleTouch,false)
+	document.getElementById('defaultCanvas0').addEventListener('touchend',handleEnd,false)
+	document.getElementById('defaultCanvas0').addEventListener('touchmove',handleMove,false)
 	let fov = PI/3 
 	let near = 200 
 	let far = 80000 
@@ -207,7 +222,7 @@ function setup() {
 	let testPoint = screenPosition(tPS.x, tPS.y, tPS.z)
 	listenMessages()
 
-	tableControl = new CenterControl(320,475)
+	// tableControl = new CenterControl(320,475)
 	
 }
 
@@ -277,9 +292,11 @@ function keyTyped(){
 }
 
 function windowResized() {
-  resizeCanvas(windowWidth/2, windowHeight,true)
-  easycam.setViewport([0,0,windowWidth/2, windowHeight])
-  resize()
+  	resizeCanvas(windowWidth/2, windowHeight,true)
+  	if(easycamIntialized){
+  		easycam.setViewport([0,0,windowWidth/2, windowHeight])
+	}
+  	resize()
 }
 
 // LISTEN FOR NEW TRACKED DEVICES AND UPDATES
@@ -318,25 +335,34 @@ function show2d() {
 	let testPoint2 = screenPosition(tPE.x, tPE.y, tPE.z)
 	
 	let user = createVector(mouseX - windowWidth/4,mouseY - windowHeight/2)
+	// in case the touch display or device is available use the touchX instead
+	if(isTouch ){
+		user = createVector (touchX - windowWidth/4 , touchY - windowHeight/2 )
+	}
+
+	// console.log(user.x , user.y)
 	let testPoint2Ref = createVector(testPoint2.x,testPoint2.y)
 	easycam.beginHUD()
-
-	tableControl.update()
-	tableControl.autoPos(random(-5,5),random(-5,5))
-	tableControl.show()
-	if(tableControl.locked){
-		bckColor = [100,int(map(tableControl.control,0,360,0,255)),100]
-	}else{
-		bckColor = [0,0,0]
+	if(isTouch){
+		fill(0,0,255,100)
+		circle(touchX,touchY,50)
 	}
+	// tableControl.update()
+	// tableControl.autoPos(random(-5,5),random(-5,5))
+	// tableControl.show()
+	// if(tableControl.locked){
+	// 	bckColor = [100,int(map(tableControl.control,0,360,0,255)),100]
+	// }else{
+	// 	bckColor = [0,0,0]
+	// }
 	fill(255,0,0)
 	noStroke()
-	if(user.dist(testPoint)<15){
+	if(user.dist(testPoint)<55){
 		circle(testPoint.x + windowWidth/4, testPoint.y + windowHeight/2, 10)
 	}else{	
 		circle(testPoint.x + windowWidth/4, testPoint.y + windowHeight/2, 1)
 	}
-	if(user.dist(testPoint2)<15){
+	if(user.dist(testPoint2)<55){
 		circle(testPoint2.x + windowWidth/4, testPoint2.y + windowHeight/2, 10)
 	}else{	
 		circle(testPoint2.x + windowWidth/4, testPoint2.y + windowHeight/2, 1)
@@ -368,27 +394,20 @@ function showMore2DPoints(){
 		testPoints[i] = screenPosition(x[i], y[i], z[i])
 	}
 	let user = createVector(mouseX - windowWidth/4,mouseY - windowHeight/2)
+	// in case the touch display or device is available use the touchX instead
+	if(isTouch ){
+		user = createVector (touchX - windowWidth/4 , touchY - windowHeight/2 )
+	}
 	easycam.beginHUD()
 		fill(255,255,100)
 		noStroke()
 		for(let i = 0; i < 400;i++){
-			if(user.dist(testPoints[i])<5){
+			if(user.dist(testPoints[i])<25){
 				circle(testPoints[i].x + windowWidth/4, testPoints[i].y + windowHeight/2, 10)
-				// x = R * cos(lat) * cos(lon)
-				// y = R * cos(lat) * sin(lon)
-				// z = R *sin(lat)
-				// lat = asin(z / R)
-				// lon = atan2(y, x)
-				// let lat = Math.asin(z[i] / r)
-				// let lon = Math.atan2(y[i],x[i])
 				let lat = Math.asin(z[i] / r )
-				// let lon = Math.acos(x[i] / r * Math.cos(lat))
 				let lon = Math.atan2(y[i], x[i])
-				// lat = map(lat, -Math.PI/2, Math.PI/2,-90,90)
-				// lon = map(lon, -Math.PI,Math.PI,-180,180) 
 				lat = lat * 180 / Math.PI
 				lon = lon * 180 / Math.PI
-				// lon = lon * 360 / 2*Math.PI
 				textSize(12)
 				let latLon = 'lat : ' + lat.toFixed(3) + ' , lon : '+ lon.toFixed(3);
 				text( latLon ,testPoints[i].x + windowWidth/4 + 10, testPoints[i].y + windowHeight/2 + 5 )
@@ -397,7 +416,7 @@ function showMore2DPoints(){
 			}
 		}
 	fill(255,0,0)
-	if(user.dist(tZurich)<5){
+	if(user.dist(tZurich)<25){
 		let lat = Math.asin(zurich.z / r)
 		let lon = Math.atan2(zurich.y,zurich.x)
 		lat = lat * 180 / PI
@@ -412,18 +431,17 @@ function showMore2DPoints(){
 		circle(tZurich.x + windowWidth/4,tZurich.y + windowHeight/2,10)
 	}else{
 		circle(tZurich.x + windowWidth/4,tZurich.y + windowHeight/2,2)
-	}
-	// fill(100,100,255)
-	// circle(tCDMX.x + windowWidth/4, tCDMX.y + windowHeight/2, 25)
-	
+	}	
 	easycam.endHUD()
 }
 function mouseClicked() {
 	toggle = !toggle 
 	if(toggle){
 		// openFullscreen()
+		// do something
 	}else{
 		// closeFullscreen()		
+		// do the opposite
 	}
 }
 function drawLine(x1, y1, z1, x2, y2, z2, r,g,b){
@@ -518,7 +536,6 @@ class TrackedDevice{
 			// stroke(0,255,0)
 			// line(windowWidth/4,windowHeight/2, this.smoothPosition.x,this.smoothPosition.y)	
 			push()
-			
 			translate(windowWidth/4,height/2)
 			rotate(radians(this.angle))
 			let sizeT = 30
@@ -645,7 +662,6 @@ class Label{
 		vertex(offX+peak, offY+this.size/3)
 		vertex(offX+peak,offY+peak)
 		endShape(CLOSE)
-
 		textSize(16)
 		fill(255,255,100,this.opacity)
 		textAlign(CENTER,CENTER)
@@ -674,7 +690,6 @@ class CenterControl{
 		this.objectID 
 	}
 	update(){	
-
 		if(this.size> this.max  || this.size < this.min){
 			this.add = this.add * -1;
 		}
@@ -744,14 +759,12 @@ class CenterControl{
 
 	}
 	show(){
-
 		noFill()
 		stroke(255,255,100,100)
 		strokeWeight(8)
 		circle(this.smoothX,this.smoothY,this.size,this.size)
 		// circle(this.smoothX, this.smoothY,50)
 	}
-
 	easeFloat (target, value, alpha = 0.1) {
     	const d = target - value
     	return value + (d * alpha)
