@@ -485,8 +485,8 @@ class TrackedDevice{
 		//let alpha = map(delta,0,windowWidth/2,0.99,0.001)
 		let alpha = 0.1
 		//if(delta > mouseX ){alpha = 0.01}else{alpha = 0.99}
-		this.smoothRotation = this.easeFloat2(this.rotation, this.smoothRotation, 0.5)
-		this.smoothRotation = 360 - this.smoothRotation
+		this.smoothRotation = this.easeFloat2((360 - this.rotation), this.smoothRotation, 0.5)
+		// this.smoothRotation = 360 - this.smoothRotation
 		//this.smoothPosition.x = this.easeFloat(this.x, this.smoothPosition.x, 0.95)
     		//this.smoothPosition.y = this.easeFloat(this.y, this.smoothPosition.y, 0.95)
 		this.smoothPosition.x = this.easeFloat2(this.x, this.smoothPosition.x, alpha)
