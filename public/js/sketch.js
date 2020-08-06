@@ -40,6 +40,7 @@ let rMY = -107
 let rMZ = 0
 let easycamIntialized=false
 let touchX =0, touchY = 0
+let projectPosition = 0
 /*  full screen */
 let elem = document.documentElement
 function openFullscreen() {
@@ -149,6 +150,13 @@ function preload() {
 
 }
 
+
+function logScroll(e) {
+	// uncomment to log position of the scroll in console
+	projectPosition = e.target.scrollTop/windowHeight
+	console.log(projectPosition)
+  // console.log(`Scroll position: ${e.target.scrollTop}`)
+}
 function setup() {
 	canvas = createCanvas(windowWidth/2, windowHeight, WEBGL) 
 	noStroke()
@@ -164,6 +172,20 @@ function setup() {
 	document.getElementById('defaultCanvas0').addEventListener('touchstart',handleTouch,false)
 	document.getElementById('defaultCanvas0').addEventListener('touchend',handleEnd,false)
 	document.getElementById('defaultCanvas0').addEventListener('touchmove',handleMove,false)
+	let projects = document.getElementsByClassName('project')
+
+	Array.prototype.forEach.call(projects, function(el,index) {
+		console.log(el , index)
+		
+		
+		el.addEventListener('click', function(){
+			console.log('click took place at project space nr. ' + index )
+		})
+
+	});
+	document.getElementsByClassName('container')[0].onscroll=logScroll
+
+
 	let fov = PI/3 
 	let near = 200 
 	let far = 80000 
