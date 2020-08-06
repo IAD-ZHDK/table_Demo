@@ -373,7 +373,8 @@ function show2d() {
 	if(testTrackDevices.length>0){
 		testTrackDevices.forEach( element => {
 			element.calculateRange()
-			tableControl.interact(element.smoothPosition.x,element.smoothPosition.y,element.smoothRotation,element.uniqueId)
+			// uncomment this if the tableControl object is available
+			// tableControl.interact(element.smoothPosition.x,element.smoothPosition.y,element.smoothRotation,element.uniqueId)
 		})
 		testTrackDevices.forEach(element =>{
 			if(element.inRange){
