@@ -288,7 +288,7 @@ function setup() {
 	tPE.y = (r+50) * Math.cos(lat) * Math.sin(lon)
 	tPE.z = (r+50) * Math.sin(lat)
 
-	let testPoint = screenPosition(tPS.x, tPS.y, tPS.z)
+	let testPoint = screenPosition(-tPS.x, tPS.y, tPS.z)
 	listenMessages()
 
 	// tableControl = new CenterControl(320,475)
@@ -406,8 +406,8 @@ function listenMessages(){
 }
 
 function show2d() {
-	let testPoint = screenPosition(tPS.x, tPS.y, tPS.z)
-	let testPoint2 = screenPosition(tPE.x, tPE.y, tPE.z)
+	let testPoint = screenPosition(-tPS.x, tPS.y, tPS.z)
+	let testPoint2 = screenPosition(-tPE.x, tPE.y, tPE.z)
 	
 	let user = createVector(mouseX - windowWidth/4,mouseY - windowHeight/2)
 	// in case the touch display or device is available use the touchX instead
@@ -475,7 +475,9 @@ function setMap(map, mapPoints, screenMapPoints){
 		point.y = r * Math.cos(latAt) * Math.sin(longAt )
 		point.z = r * Math.sin(latAt)
 		mapPoints.push(point)
-		let screenPoint = screenPosition(point.x,point.y,point.z)
+		// * note for some reason, the x-projection needs to be negative (-) otherwise the maps are mirrored
+		// * it applies to all other points too
+		let screenPoint = screenPosition(-point.x,point.y,point.z)
 		let screen2DVector = createVector(screenPoint.x,screenPoint.y)
 		screenMapPoints.push(screen2DVector)
 	}
@@ -484,9 +486,9 @@ function setMap(map, mapPoints, screenMapPoints){
 function showMap(mapPoints, screenMapPoints, farbe){
 	// let screenMapPoints = []
 
-	let step = 4
+	let step = 1
 	for( let i = 0 ; i < screenMapPoints.length -step ; i = i +step){
-		let screenPoint = screenPosition(mapPoints[i].x,mapPoints[i].y,mapPoints[i].z)
+		let screenPoint = screenPosition(-mapPoints[i].x,mapPoints[i].y,mapPoints[i].z)
 		let screen2DVector = createVector(screenPoint.x,screenPoint.y)
 		screenMapPoints[i] = screen2DVector
 	}
@@ -504,11 +506,11 @@ function showMap(mapPoints, screenMapPoints, farbe){
 }
 function showMore2DPoints(){
 	let testPoints = []
-	let tZurich = screenPosition(zurich.x,zurich.y,zurich.z)
-	let tCDMX = screenPosition(cdmx.x,cdmx.y,cdmx.z)
+	let tZurich = screenPosition(-zurich.x,zurich.y,zurich.z)
+	let tCDMX = screenPosition(-cdmx.x,cdmx.y,cdmx.z)
 
 	for(let i = 0 ; i <400; i++){
-		testPoints[i] = screenPosition(x[i], y[i], z[i])
+		testPoints[i] = screenPosition(-x[i], y[i], z[i])
 	}
 	let user = createVector(mouseX - windowWidth/4,mouseY - windowHeight/2)
 	// in case the touch display or device is available use the touchX instead
@@ -759,7 +761,8 @@ class Label{
 			"I'M A PROTOTYPE FOR TANGIBLE INTERACTION AND DATA VISUALIZATION",
 			"MOVE ME AROUND TO EXPLORE MY AFFORDANCES!",
 			"STUDENTS FROM INTERACTION DESIGN USE ME TO EXPLORE THEIR CONCEPTS",
-			"DESIGN ... TECHNOLOGY ... THINKING ... CONCEIVING ...  DOING ...  "
+			"DESIGN ... TECHNOLOGY ... THINKING ... CONCEIVING ...  DOING ...  ",
+			"PROTOTYPING"
 		]
 		let peak = 10
 		
@@ -785,7 +788,7 @@ class Label{
 		textSize(16)
 		fill(255,255,100,this.opacity)
 		textAlign(CENTER,CENTER)
-		text(txtContent[int(map(this.rotation,40,360,-1,3))],offX +30 , offY - this.size/4, this.size-25, this.size/2 )
+		text(txtContent[int(map(this.rotation,1,360,-1,4))],offX +30 , offY - this.size/4, this.size-25, this.size/2 )
 		pop()
 
 	}
