@@ -306,9 +306,13 @@ function draw() {
 	showMap(pointsAfrica, screenPointsAfrica ,color(0,255,100))
 	showMap(pointsEuAsia, screenPointsEuAsia ,color(200,255,100))
 	showMap(pointsAustralia, screenPointsAustralia ,color(255,50,100))
-	easycam.setCenter([0,0,0],0.05)
+	// easycam.setCenter([0,0,0],0.0)
 
 
+}
+
+function touchMoved() {
+  return false;
 }
 
 function show3D(){
