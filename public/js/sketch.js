@@ -95,7 +95,7 @@ function init(){
 				items[i].style.background = "rgb(0,0,0)"
 	}
 	cssScrollSnapPolyfill()
-	carousel()
+	// carousel()
 }
 let touchCount = 0
 let ongoingTouches = []
@@ -104,7 +104,7 @@ function handleTouch(evt){
 	isTouch=true
 	touchCount++
 	let touches = evt.changedTouches;
-	console.log("touch started at : " + evt.touches[0].clientX + " , " + evt.touches[0].clientY)
+	// console.log("touch started at : " + evt.touches[0].clientX + " , " + evt.touches[0].clientY)
 
 	touchX = evt.touches[0].clientX
 	touchY = evt.touches[0].clientY
@@ -113,13 +113,13 @@ function handleTouch(evt){
 
 function handleEnd(evt) {
 	isTouch=false
-	console.log("touch ended at : " + evt.changedTouches[0].pageX + " , " + evt.changedTouches[0].pageY )
+	// console.log("touch ended at : " + evt.changedTouches[0].pageX + " , " + evt.changedTouches[0].pageY )
 	touchX = evt.changedTouches[0].pageX
 	touchY = evt.changedTouches[0].pageY
 }
 
 function handleMove(evt) {
-	 console.log("touch moved at : " + evt.changedTouches[0].pageX + " , " + evt.changedTouches[0].pageY )
+	 // console.log("touch moved at : " + evt.changedTouches[0].pageX + " , " + evt.changedTouches[0].pageY )
 	touchX = evt.changedTouches[0].pageX
 	touchY = evt.changedTouches[0].pageY
 }
