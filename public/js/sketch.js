@@ -937,7 +937,7 @@ function carousel(){
 	}
 
 	let autoChangeA = setInterval(changeSlideA, delay)
-	let autoChangeB = setInterval(changeSlideA, delay)
+	let autoChangeB = setInterval(changeSlideB, delay)
 
 	const restartA = function() {
 	  clearInterval(autoChangeA)
@@ -961,7 +961,7 @@ function carousel(){
 	})
 	// ControlsB
 	document.querySelector(".next-slide-B").addEventListener("click", function() {
-	  changeSlide()
+	  changeSlideB()
 	  restartB()
 	})
 
@@ -969,6 +969,7 @@ function carousel(){
 	  changeSlideB(false)
 	  restartB()
 	})
+	
 
 
 }
