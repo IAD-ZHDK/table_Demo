@@ -154,7 +154,7 @@ img{
 	position: relative;
   	width: 40%;
   	height: 30%;
-  	top: calc(-50% + 100px);
+  	top: calc(-30% + 50px);
   	margin:0;
   	left: 50%;
   	overflow: hidden;
