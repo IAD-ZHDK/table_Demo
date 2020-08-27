@@ -17,7 +17,10 @@ body {
 	/*text-transform: uppercase;*/
 	/*color:rgb(255,255,100);*/
 	color:#ffffff;
+	/* no text selection*/
 	user-select: none;
+	/* disable blinking effect when tapping over DIV */
+	-webkit-tap-highlight-color: rgba(0, 0, 0, 0);
 }
 
 
