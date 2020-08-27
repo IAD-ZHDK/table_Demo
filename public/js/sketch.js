@@ -905,8 +905,9 @@ function carouselSizing(){
 	let videoHeight = document.querySelectorAll('video')[0].offsetHeight
 
 	let carousels = document.querySelectorAll('.carousel')
+	alert(videoHeight)
 	carousels.forEach( element=>{
-		 element.style.top = -videoHeight + 115 + "px"
+		 element.style.top = -videoHeight + 65 + "px"
 	})
 
 }
