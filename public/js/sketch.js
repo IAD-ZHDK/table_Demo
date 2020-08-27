@@ -142,7 +142,7 @@ function ongoingTouchIndexById(idToFind) {
 
 function resize(){
 	init()
-	carouselSizing()
+
 }
 
 function getRandomColor(){
@@ -265,7 +265,6 @@ function setup() {
 	let latMX = radians(19.4969)
 	let lonMX = radians(-99.7233)
 
-carouselSizing()
 	// 	x = R * cos(lat) * cos(lon)
 	// y = R * cos(lat) * sin(lon)
 	// z = R *sin(lat)
@@ -901,53 +900,76 @@ class CenterControl{
 
 
 
-function carouselSizing(){
-	let videoHeight = document.querySelectorAll('video')[0].offsetHeight
 
-	let carousels = document.querySelectorAll('.carousel')
-	// alert(videoHeight)
-	carousels.forEach( element=>{
-		 // element.style.top = -videoHeight + 180 + "px"
-	})
-
-}
 // image carousel
 function carousel(){
 	const delay = 8000 //ms
 
 	const slidesA = document.querySelector(".slides-A")
 	const slidesCountA = slidesA.childElementCount
-	const maxLeft = (slidesCountA - 1) * 100 * -1
+	const maxLeftA= (slidesCountA - 1) * 100 * -1
+	let currentA = 0
 
-	let current = 0
+	const slidesB = document.querySelector(".slides-B")
+	const slidesCountB = slidesB.childElementCount
+	const maxLeftB= (slidesCountB - 1) * 100 * -1
+	let currentB = 0
 
 
-	function changeSlide(next = true) {
+	function changeSlideA(next = true) {
 	  if (next) {
-	    current += current > maxLeft ? -100 : current * -1
+	    currentA += currentA > maxLeftA ? -100 : currentA * -1
 	  } else {
-	    current = current < 0 ? current + 100 : maxLeft
+	    currentA = currentA < 0 ? currentA + 100 : maxLeftA
 	  }
 
-	  slidesA.style.left = current + "%"
-	  // alert('slide changed')
+	  slidesA.style.left = currentA + "%"
 	}
 
-	let autoChange = setInterval(changeSlide, delay)
-	const restart = function() {
-	  clearInterval(autoChange)
-	  autoChange = setInterval(changeSlide, delay)
+	function changeSlideB(next = true) {
+	  if (next) {
+	    currentB += currentB > maxLeftB ? -100 : currentB * -1
+	  } else {
+	    currentB = currentB < 0 ? currentB + 100 : maxLeftB
+	  }
+
+	  slidesB.style.left = currentB + "%"
 	}
 
-	// Controls
+	let autoChangeA = setInterval(changeSlideA, delay)
+	let autoChangeB = setInterval(changeSlideA, delay)
+
+	const restartA = function() {
+	  clearInterval(autoChangeA)
+	  autoChangeA = setInterval(changeSlideA, delay)
+	}
+
+	const restartB = function(){
+		clearInterval(autoChangeB)
+	 	autoChangeB = setInterval(changeSlideB, delay)
+	}
+
+	// ControlsA
 	document.querySelector(".next-slide-A").addEventListener("click", function() {
-	  changeSlide()
-	  restart()
+	  changeSlideA()
+	  restartA()
 	})
 
 	document.querySelector(".prev-slide-A").addEventListener("click", function() {
-	  changeSlide(false)
-	  restart()
+	  changeSlideA(false)
+	  restartA()
 	})
+	// ControlsB
+	document.querySelector(".next-slide-B").addEventListener("click", function() {
+	  changeSlide()
+	  restartB()
+	})
+
+	document.querySelector(".prev-slide-B").addEventListener("click", function() {
+	  changeSlideB(false)
+	  restartB()
+	})
+
+
 }
 
