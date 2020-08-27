@@ -142,6 +142,7 @@ function ongoingTouchIndexById(idToFind) {
 
 function resize(){
 	init()
+	carouselSizing()
 }
 
 function getRandomColor(){
@@ -905,7 +906,7 @@ function carouselSizing(){
 
 	let carousels = document.querySelectorAll('.carousel')
 	carousels.forEach( element=>{
-		 element.style.top = -videoHeight + 65 + "px"
+		 element.style.top = -videoHeight + 115 + "px"
 	})
 
 }
