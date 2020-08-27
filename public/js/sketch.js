@@ -134,10 +134,10 @@ function ongoingTouchIndexById(idToFind) {
     var id = ongoingTouches[i].identifier;
     
     if (id == idToFind) {
-      return i;
+      return i
     }
   }
-  return -1;    // not found
+  return -1    // not found
 }
 
 function resize(){
@@ -218,13 +218,10 @@ function setup() {
 
 	Array.prototype.forEach.call(projects, function(el,index) {
 		// console.log(el , index)
-		
-		
 		el.addEventListener('click', function(){
 			// console.log('click took place at project space nr. ' + index )
 		})
-
-	});
+	})
 	document.getElementsByClassName('container')[0].onscroll=logScroll
 
 
@@ -267,6 +264,7 @@ function setup() {
 	let latMX = radians(19.4969)
 	let lonMX = radians(-99.7233)
 
+carouselSizing()
 	// 	x = R * cos(lat) * cos(lon)
 	// y = R * cos(lat) * sin(lon)
 	// z = R *sin(lat)
@@ -901,42 +899,53 @@ class CenterControl{
 }
 
 
+
+function carouselSizing(){
+	let videoHeight = document.querySelectorAll('video')[0].offsetHeight
+
+	let carousels = document.querySelectorAll('.carousel')
+	carousels.forEach( element=>{
+		 element.style.top = -videoHeight + 115 + "px"
+	})
+
+}
 // image carousel
 function carousel(){
-const delay = 8000; //ms
+	const delay = 8000 //ms
 
-const slides = document.querySelector(".slides");
-const slidesCount = slides.childElementCount;
-const maxLeft = (slidesCount - 1) * 100 * -1;
+	const slidesA = document.querySelector(".slides-A")
+	const slidesCountA = slidesA.childElementCount
+	const maxLeft = (slidesCountA - 1) * 100 * -1
 
-let current = 0;
+	let current = 0
 
-function changeSlide(next = true) {
-  if (next) {
-    current += current > maxLeft ? -100 : current * -1;
-  } else {
-    current = current < 0 ? current + 100 : maxLeft;
-  }
 
-  slides.style.left = current + "%";
-  // alert('slide changed')
-}
+	function changeSlide(next = true) {
+	  if (next) {
+	    current += current > maxLeft ? -100 : current * -1
+	  } else {
+	    current = current < 0 ? current + 100 : maxLeft
+	  }
 
-let autoChange = setInterval(changeSlide, delay);
-const restart = function() {
-  clearInterval(autoChange);
-  autoChange = setInterval(changeSlide, delay);
-};
+	  slidesA.style.left = current + "%"
+	  // alert('slide changed')
+	}
 
-// Controls
-document.querySelector(".next-slide").addEventListener("click", function() {
-  changeSlide();
-  restart();
-});
+	let autoChange = setInterval(changeSlide, delay)
+	const restart = function() {
+	  clearInterval(autoChange)
+	  autoChange = setInterval(changeSlide, delay)
+	}
 
-document.querySelector(".prev-slide").addEventListener("click", function() {
-  changeSlide(false);
-  restart();
-});
+	// Controls
+	document.querySelector(".next-slide-A").addEventListener("click", function() {
+	  changeSlide()
+	  restart()
+	})
+
+	document.querySelector(".prev-slide-A").addEventListener("click", function() {
+	  changeSlide(false)
+	  restart()
+	})
 }
 

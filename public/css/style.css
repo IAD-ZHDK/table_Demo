@@ -17,6 +17,7 @@ body {
 	/*text-transform: uppercase;*/
 	/*color:rgb(255,255,100);*/
 	color:#ffffff;
+	user-select: none;
 }
 
 
@@ -187,7 +188,7 @@ img{
 	cursor: pointer;
 }
 
-.slides {
+.slides-A, .slides-B {
    position: absolute;
       top: 50%;
       left: 0;
