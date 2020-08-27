@@ -301,10 +301,10 @@ function draw() {
 	show2d() 
 	showMore2DPoints()
 
-	showMap(pointsAmerica, screenPointsAmerica ,color(0,255,255))
-	showMap(pointsAfrica, screenPointsAfrica ,color(0,255,100))
-	showMap(pointsEuAsia, screenPointsEuAsia ,color(200,255,100))
-	showMap(pointsAustralia, screenPointsAustralia ,color(255,50,100))
+	showMap(pointsAmerica, screenPointsAmerica ,color(215,215,255))
+	showMap(pointsAfrica, screenPointsAfrica ,color(255,215,255))
+	showMap(pointsEuAsia, screenPointsEuAsia ,color(215,255,255))
+	showMap(pointsAustralia, screenPointsAustralia ,color(255,215,255))
 	easycam.setCenter([0,0,0],0.0)
 
 
