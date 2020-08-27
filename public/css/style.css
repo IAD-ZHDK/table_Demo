@@ -147,3 +147,58 @@ img{
 }
 
 
+/* carousel */
+
+.carousel {
+
+	position: relative;
+  	width: 40%;
+  	height: 30%;
+  	top: calc(-50% + 100px);
+  	margin:0;
+  	left: 50%;
+  	overflow: hidden;
+
+}
+  
+.controls {
+	opacity: 1;
+	display: flex;
+	position: absolute;
+	top: 50%;
+	left: 0;
+	justify-content: space-between;
+	width: 100%;
+	z-index: 99999;
+	transition: all ease 0.5s;
+}
+    
+.control {
+	margin: 0 5px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	height: 40px;
+	width: 40px;
+	border-radius: 50%;
+	background-color: rgba(255, 255, 255, 0.7);
+	opacity: .5;
+	transition: ease .3s;
+	cursor: pointer;
+}
+
+.slides {
+   position: absolute;
+      top: 50%;
+      left: 0;
+      transform: translateY(-50%);
+      display: flex;
+      width: 100%;
+      transition: 1s ease-in-out all;
+}
+.slide {
+  	min-width: 100%;
+    min-height: 100%;
+        height: auto;
+     
+}
