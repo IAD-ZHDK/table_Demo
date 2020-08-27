@@ -95,6 +95,7 @@ function init(){
 				items[i].style.background = "rgb(0,0,0)"
 	}
 	cssScrollSnapPolyfill()
+	carousel()
 }
 let touchCount = 0
 let ongoingTouches = []
@@ -220,7 +221,7 @@ function setup() {
 		
 		
 		el.addEventListener('click', function(){
-			console.log('click took place at project space nr. ' + index )
+			// console.log('click took place at project space nr. ' + index )
 		})
 
 	});
@@ -552,9 +553,9 @@ function showMore2DPoints(){
 		}else{
 			text( latLon ,tZurich.x + windowWidth/4 + 20, tZurich.y + windowHeight/2 + 5 )
 		}
-		circle(tZurich.x + windowWidth/4,tZurich.y + windowHeight/2,20)
+		circle(tZurich.x + windowWidth/4,tZurich.y + windowHeight/2,25)
 	}else{
-		circle(tZurich.x + windowWidth/4,tZurich.y + windowHeight/2,5)
+		circle(tZurich.x + windowWidth/4,tZurich.y + windowHeight/2,15)
 	}	
 	fill(0,0,255)
 	circle(tCDMX.x + windowWidth/4,tCDMX.y + windowHeight/2,5)
@@ -899,3 +900,43 @@ class CenterControl{
   	}
 }
 
+
+
+// image carousel
+function carousel(){
+const delay = 8000; //ms
+
+const slides = document.querySelector(".slides");
+const slidesCount = slides.childElementCount;
+const maxLeft = (slidesCount - 1) * 100 * -1;
+
+let current = 0;
+
+function changeSlide(next = true) {
+  if (next) {
+    current += current > maxLeft ? -100 : current * -1;
+  } else {
+    current = current < 0 ? current + 100 : maxLeft;
+  }
+
+  slides.style.left = current + "%";
+  // alert('slide changed')
+}
+
+let autoChange = setInterval(changeSlide, delay);
+const restart = function() {
+  clearInterval(autoChange);
+  autoChange = setInterval(changeSlide, delay);
+};
+
+// Controls
+document.querySelector(".next-slide").addEventListener("click", function() {
+  changeSlide();
+  restart();
+});
+
+document.querySelector(".prev-slide").addEventListener("click", function() {
+  changeSlide(false);
+  restart();
+});
+}
