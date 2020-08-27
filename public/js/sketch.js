@@ -915,6 +915,16 @@ function carousel(){
 	const maxLeftB= (slidesCountB - 1) * 100 * -1
 	let currentB = 0
 
+	const slidesC = document.querySelector(".slides-C")
+	const slidesCountC = slidesC.childElementCount
+	const maxLeftC= (slidesCountC - 1) * 100 * -1
+	let currentC = 0
+
+	const slidesD = document.querySelector(".slides-D")
+	const slidesCountD = slidesD.childElementCount
+	const maxLeftD= (slidesCountD - 1) * 100 * -1
+	let currentD = 0
+
 
 	function changeSlideA(next = true) {
 	  if (next) {
@@ -936,8 +946,29 @@ function carousel(){
 	  slidesB.style.left = currentB + "%"
 	}
 
+	function changeSlideC(next = true) {
+	  if (next) {
+	    currentC += currentC > maxLeftC ? -100 : currentC * -1
+	  } else {
+	    currentC = currentC < 0 ? currentC + 100 : maxLeftC
+	  }
+
+	  slidesC.style.left = currentC + "%"
+	}
+
+	function changeSlideD(next = true) {
+	  if (next) {
+	    currentD += currentD > maxLeftD ? -100 : currentD * -1
+	  } else {
+	    currentD = currentD < 0 ? currentD + 100 : maxLeftD
+	  }
+	  slidesD.style.left = currentD + "%"
+	}
+
 	let autoChangeA = setInterval(changeSlideA, delay)
 	let autoChangeB = setInterval(changeSlideB, delay)
+	let autoChangeC = setInterval(changeSlideC, delay)
+	let autoChangeD = setInterval(changeSlideD, delay)
 
 	const restartA = function() {
 	  clearInterval(autoChangeA)
@@ -947,6 +978,16 @@ function carousel(){
 	const restartB = function(){
 		clearInterval(autoChangeB)
 	 	autoChangeB = setInterval(changeSlideB, delay)
+	}
+
+	const restartC = function(){
+		clearInterval(autoChangeC)
+	 	autoChangeC = setInterval(changeSlideC, delay)
+	}
+
+	const restartD = function(){
+		clearInterval(autoChangeD)
+	 	autoChangeD = setInterval(changeSlideD, delay)
 	}
 
 	// ControlsA
@@ -969,7 +1010,28 @@ function carousel(){
 	  changeSlideB(false)
 	  restartB()
 	})
-	
+
+	// ControlsC
+	document.querySelector(".next-slide-C").addEventListener("click", function() {
+	  changeSlideC()
+	  restartC()
+	})
+
+	document.querySelector(".prev-slide-C").addEventListener("click", function() {
+	  changeSlideC(false)
+	  restartC()
+	})
+
+	// ControlsD
+	document.querySelector(".next-slide-D").addEventListener("click", function() {
+	  changeSlideD()
+	  restartD()
+	})
+
+	document.querySelector(".prev-slide-D").addEventListener("click", function() {
+	  changeSlideD(false)
+	  restartD()
+	})
 
 
 }

@@ -188,7 +188,7 @@ img{
 	cursor: pointer;
 }
 
-.slides-A, .slides-B {
+.slides-A, .slides-B, .slides-C, .slides-D {
    position: absolute;
       top: 50%;
       left: 0;
