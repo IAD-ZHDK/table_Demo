@@ -306,7 +306,9 @@ function draw() {
 	showMap(pointsAfrica, screenPointsAfrica ,color(0,255,100))
 	showMap(pointsEuAsia, screenPointsEuAsia ,color(200,255,100))
 	showMap(pointsAustralia, screenPointsAustralia ,color(255,50,100))
-
+	// easycam.setCenter(createVector(windowWidth/4,windowHeight/2,1500),0.05)
+	easycam.panX(random(-1,1))
+	easycam.panY(random(-1,1))
 
 }
 

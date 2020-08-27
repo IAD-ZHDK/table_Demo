@@ -69,7 +69,7 @@ body {
 
 }
 
-h2 {
+/*h2 {
 	position: fixed;
 	text-align: center;
 	font-size: 1.5rem;
@@ -80,7 +80,7 @@ h2 {
 	em {
 		font-weight: bold;
 	}
-}
+}*/
 
 .container {
 	position: absolute;
