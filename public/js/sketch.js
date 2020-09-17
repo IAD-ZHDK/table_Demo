@@ -4,7 +4,8 @@
 
 // references
 // reference https://github.com/bohnacker/p5js-screenPosition
-// https://github.com/processing/p5.js/issues/1553
+// https://github.com/processing/p5.js/issues/1553 -> solving the 2d Projection of 3d points
+// https://www.keene.edu/campus/maps/tool/ -> drawing earth maps and converting them into latitude longitude
 
 
 
@@ -35,13 +36,28 @@ let tableControl
 let bckColor = [0,0,0]
 let zurich
 let cdmx
-let rMX = -161
-let rMY = -107
-let rMZ = 0
+let rMX =  0/* -161 */
+let rMY =  0/* -107 */
+let rMZ =  0
 let easycamIntialized=false
 let touchX =0, touchY = 0
 let projectPosition = 0
 let media
+
+let americaMap
+let australiaMap
+let euAsiaMap
+let africaMap
+let screenPointsAmerica = []
+let screenPointsEuAsia = []
+let screenPointsAfrica = []
+let screenPointsAustralia = []
+let pointsAmerica = []
+let pointsEuAsia = []
+let pointsAfrica = []
+let pointsAustralia = []
+
+
 /*  full screen */
 let elem = document.documentElement
 function openFullscreen() {
@@ -76,10 +92,10 @@ function init(){
 	let items = document.querySelectorAll(".project")
 
 	for (let i = 0; i < items.length; i++) {
-		// items[i].style.background = getRandomColor()
 				items[i].style.background = "rgb(0,0,0)"
 	}
 	cssScrollSnapPolyfill()
+	carousel()
 }
 let touchCount = 0
 let ongoingTouches = []
@@ -88,7 +104,7 @@ function handleTouch(evt){
 	isTouch=true
 	touchCount++
 	let touches = evt.changedTouches;
-	console.log("touch started at : " + evt.touches[0].clientX + " , " + evt.touches[0].clientY)
+	// console.log("touch started at : " + evt.touches[0].clientX + " , " + evt.touches[0].clientY)
 
 	touchX = evt.touches[0].clientX
 	touchY = evt.touches[0].clientY
@@ -97,13 +113,13 @@ function handleTouch(evt){
 
 function handleEnd(evt) {
 	isTouch=false
-	console.log("touch ended at : " + evt.changedTouches[0].pageX + " , " + evt.changedTouches[0].pageY )
+	// console.log("touch ended at : " + evt.changedTouches[0].pageX + " , " + evt.changedTouches[0].pageY )
 	touchX = evt.changedTouches[0].pageX
 	touchY = evt.changedTouches[0].pageY
 }
 
 function handleMove(evt) {
-	 console.log("touch moved at : " + evt.changedTouches[0].pageX + " , " + evt.changedTouches[0].pageY )
+	 // console.log("touch moved at : " + evt.changedTouches[0].pageX + " , " + evt.changedTouches[0].pageY )
 	touchX = evt.changedTouches[0].pageX
 	touchY = evt.changedTouches[0].pageY
 }
@@ -118,14 +134,15 @@ function ongoingTouchIndexById(idToFind) {
     var id = ongoingTouches[i].identifier;
     
     if (id == idToFind) {
-      return i;
+      return i
     }
   }
-  return -1;    // not found
+  return -1    // not found
 }
 
 function resize(){
 	init()
+
 }
 
 function getRandomColor(){
@@ -140,9 +157,19 @@ function getRandomColor(){
 function preload() {
   	earthImg = loadImage('../imgs/earth.jpg') 
 	sky = loadImage('../imgs/sky.jpg') 
-	moonImg = loadImage('../imgs/moon.jpg') 
+	moonImg = loadImage('../imgs/moon.jpg')
+	americaMap = loadTable('assets/maps/america.csv', '', '')
+	australiaMap = loadTable('assets/maps/australia.csv', '', '')
+	euAsiaMap = loadTable('assets/maps/euro-asia.csv','','')
+	africaMap = loadTable('assets/maps/africa.csv','','')
+
+	// for (let r = 0; r < americaMap.getRowCount(); r++)
+ //    for (let c = 0; c < americaMap.getColumnCount(); c++) {
+ //      	console.log(americaMap.getString(r, c))
+ //    	}
+	// }
 	socket.on('connected',function(data){
-		console.log('new client connected id:' + data.id) 
+		// console.log('new client connected id:' + data.id) 
 	}) 
 	
 	myFont = loadFont('assets/Futura-Lig.otf')
@@ -173,6 +200,7 @@ function setup() {
 	canvas = createCanvas(windowWidth/2, windowHeight, WEBGL) 
 	noStroke()
 	textFont(myFont)
+	
 	if(!easycamIntialized){
 		easycam = new Dw.EasyCam(this._renderer, {distance:1500, center:[0,0,0]}) 
 		easycam.setDistanceMin(100)
@@ -186,18 +214,15 @@ function setup() {
 	document.getElementById('defaultCanvas0').addEventListener('touchmove',handleMove,false)
 
 	media = document.querySelectorAll('video')
-	console.log(media.length)
+	// console.log(media.length)
 	let projects = document.getElementsByClassName('project')
 
 	Array.prototype.forEach.call(projects, function(el,index) {
-		console.log(el , index)
-		
-		
+		// console.log(el , index)
 		el.addEventListener('click', function(){
-			console.log('click took place at project space nr. ' + index )
+			// console.log('click took place at project space nr. ' + index )
 		})
-
-	});
+	})
 	document.getElementsByClassName('container')[0].onscroll=logScroll
 
 
@@ -206,6 +231,11 @@ function setup() {
 	let far = 80000 
 
 	addScreenPositionFunction(this)
+
+	setMap(americaMap,pointsAmerica,screenPointsAmerica)
+	setMap(africaMap,pointsAfrica,screenPointsAfrica)
+	setMap(australiaMap,pointsAustralia,screenPointsAustralia)
+	setMap(euAsiaMap,pointsEuAsia,screenPointsEuAsia)
 	// console.log(this._renderer)
 
 	// CREATING A RANDOM ARRAY OF POINTS AROUND THE GLOBE
@@ -213,31 +243,31 @@ function setup() {
 		let lat = radians(random(-90,90)) 
 		let lon = radians(random(-180,180)) 
 		//cartesian coordinates
+		x.push(r * Math.cos(lat) * Math.cos(lon)) 
 		y.push(r * Math.cos(lat) * Math.sin(lon)) 
 		z.push(r * Math.sin(lat)) 
-		x.push(r * Math.cos(lat) * Math.cos(lon)) 
+		
+		x2.push((r+250) * Math.cos(lat) * Math.cos(lon)) 
 		y2.push((r+250) * Math.cos(lat) * Math.sin(lon)) 
 		z2.push((r+250) * Math.sin(lat)) 
-		x2.push((r+250) * Math.cos(lat) * Math.cos(lon)) 
+		
 	}
 	tPS = createVector()
 	tPE = createVector()
 
 	// SETTING RANDOM LOCATION FOR INTERACTIVE 3D POINT(S) EXAMPLE
-	let lat = radians(8.5417)
-	let lon = radians(47.3769)
+	let lat = radians(47.3769)
+	let lon = radians(8.5417)
 
-	let latZ = radians(8.5417)
-	let lonZ = radians(47.3769)
+	let latZ = radians(47.3769)
+	let lonZ = radians(8.5417)
 
 	let latMX = radians(19.4969)
 	let lonMX = radians(-99.7233)
 
 	// 	x = R * cos(lat) * cos(lon)
-
-// y = R * cos(lat) * sin(lon)
-
-// z = R *sin(lat)
+	// y = R * cos(lat) * sin(lon)
+	// z = R *sin(lat)
 
 	zurich = createVector(0,0,0)
 	zurich.x = r * Math.cos(latZ) * Math.cos(lonZ )
@@ -249,14 +279,15 @@ function setup() {
 	cdmx.y =  r * Math.cos(latMX) * Math.sin(lonMX )
 	cdmx.z = r * Math.sin(latMX)
 
+	tPS.x = r * Math.cos(lat) * Math.cos(lon)
 	tPS.y = r * Math.cos(lat) * Math.sin(lon)
 	tPS.z = r * Math.sin(lat)
-	tPS.x = r * Math.cos(lat) * Math.cos(lon)
+
+	tPE.x = (r+50) * Math.cos(lat) * Math.cos(lon)	
 	tPE.y = (r+50) * Math.cos(lat) * Math.sin(lon)
 	tPE.z = (r+50) * Math.sin(lat)
-	tPE.x = (r+50) * Math.cos(lat) * Math.cos(lon)
 
-	let testPoint = screenPosition(tPS.x, tPS.y, tPS.z)
+	let testPoint = screenPosition(-tPS.x, tPS.y, tPS.z)
 	listenMessages()
 
 	// tableControl = new CenterControl(320,475)
@@ -270,7 +301,18 @@ function draw() {
 	show2d() 
 	showMore2DPoints()
 
+	showMap(pointsAmerica, screenPointsAmerica ,color(215,215,255))
+	showMap(pointsAfrica, screenPointsAfrica ,color(255,215,255))
+	showMap(pointsEuAsia, screenPointsEuAsia ,color(215,255,255))
+	showMap(pointsAustralia, screenPointsAustralia ,color(255,215,255))
+	easycam.setCenter([0,0,0],0.0)
+
+
 }
+
+// function touchMoved() {
+//   return false;
+// }
 
 function show3D(){
 	if(threeDview){
@@ -368,8 +410,8 @@ function listenMessages(){
 }
 
 function show2d() {
-	let testPoint = screenPosition(tPS.x, tPS.y, tPS.z)
-	let testPoint2 = screenPosition(tPE.x, tPE.y, tPE.z)
+	let testPoint = screenPosition(-tPS.x, tPS.y, tPS.z)
+	let testPoint2 = screenPosition(-tPE.x, tPE.y, tPE.z)
 	
 	let user = createVector(mouseX - windowWidth/4,mouseY - windowHeight/2)
 	// in case the touch display or device is available use the touchX instead
@@ -422,14 +464,57 @@ function show2d() {
 	easycam.endHUD() 
 }
 
+// function calculateMaps
 
+function setMap(map, mapPoints, screenMapPoints){
+
+	let mapLong = map.getColumn(0)
+	let mapLat = map.getColumn(1)
+	for(let i = 0; i < mapLong.length; i ++){
+
+		let latAt = radians(mapLat[i])
+		let longAt = radians(mapLong[i])
+		let point = createVector(0,0,0)
+		point.x = r * Math.cos(latAt) * Math.cos(longAt )
+		point.y = r * Math.cos(latAt) * Math.sin(longAt )
+		point.z = r * Math.sin(latAt)
+		mapPoints.push(point)
+		// * note for some reason, the x-projection needs to be negative (-) otherwise the maps are mirrored
+		// * it applies to all other points too
+		let screenPoint = screenPosition(-point.x,point.y,point.z)
+		let screen2DVector = createVector(screenPoint.x,screenPoint.y)
+		screenMapPoints.push(screen2DVector)
+	}
+
+}
+function showMap(mapPoints, screenMapPoints, farbe){
+	// let screenMapPoints = []
+
+	let step = 1
+	for( let i = 0 ; i < screenMapPoints.length -step ; i = i +step){
+		let screenPoint = screenPosition(-mapPoints[i].x,mapPoints[i].y,mapPoints[i].z)
+		let screen2DVector = createVector(screenPoint.x,screenPoint.y)
+		screenMapPoints[i] = screen2DVector
+	}
+	
+	strokeWeight(1)
+	easycam.beginHUD()
+		beginShape()
+		stroke(farbe)
+		noFill()
+		for( let i = 0; i < screenMapPoints.length -step ; i = i +step ){
+			vertex(screenMapPoints[i].x + windowWidth/4, screenMapPoints[i].y + windowHeight/2)
+		}
+		endShape(CLOSE)
+	easycam.endHUD()
+}
 function showMore2DPoints(){
 	let testPoints = []
-	let tZurich = screenPosition(zurich.x,zurich.y,zurich.z)
-	let tCDMX = screenPosition(cdmx.x,cdmx.y,cdmx.z)
+	let tZurich = screenPosition(-zurich.x,zurich.y,zurich.z)
+	let tCDMX = screenPosition(-cdmx.x,cdmx.y,cdmx.z)
 
 	for(let i = 0 ; i <400; i++){
-		testPoints[i] = screenPosition(x[i], y[i], z[i])
+		testPoints[i] = screenPosition(-x[i], y[i], z[i])
 	}
 	let user = createVector(mouseX - windowWidth/4,mouseY - windowHeight/2)
 	// in case the touch display or device is available use the touchX instead
@@ -439,7 +524,7 @@ function showMore2DPoints(){
 	easycam.beginHUD()
 		fill(255,255,100)
 		noStroke()
-		for(let i = 0; i < 400;i++){
+		for(let i = 0; i < 50;i++){
 			if(user.dist(testPoints[i])<25){
 				circle(testPoints[i].x + windowWidth/4, testPoints[i].y + windowHeight/2, 10)
 				let lat = Math.asin(z[i] / r )
@@ -450,10 +535,10 @@ function showMore2DPoints(){
 				let latLon = 'lat : ' + lat.toFixed(3) + ' , lon : '+ lon.toFixed(3);
 				text( latLon ,testPoints[i].x + windowWidth/4 + 10, testPoints[i].y + windowHeight/2 + 5 )
 			}else{
-				circle(testPoints[i].x + windowWidth/4, testPoints[i].y + windowHeight/2, 1)
+				circle(testPoints[i].x + windowWidth/4, testPoints[i].y + windowHeight/2, 3)
 			}
 		}
-	fill(255,0,0)
+	fill(255,100,100)
 	if(user.dist(tZurich)<25){
 		let lat = Math.asin(zurich.z / r)
 		let lon = Math.atan2(zurich.y,zurich.x)
@@ -466,10 +551,12 @@ function showMore2DPoints(){
 		}else{
 			text( latLon ,tZurich.x + windowWidth/4 + 20, tZurich.y + windowHeight/2 + 5 )
 		}
-		circle(tZurich.x + windowWidth/4,tZurich.y + windowHeight/2,10)
+		circle(tZurich.x + windowWidth/4,tZurich.y + windowHeight/2,25)
 	}else{
-		circle(tZurich.x + windowWidth/4,tZurich.y + windowHeight/2,2)
+		circle(tZurich.x + windowWidth/4,tZurich.y + windowHeight/2,15)
 	}	
+	fill(0,0,255)
+	circle(tCDMX.x + windowWidth/4,tCDMX.y + windowHeight/2,5)
 	easycam.endHUD()
 }
 function mouseClicked() {
@@ -678,7 +765,8 @@ class Label{
 			"I'M A PROTOTYPE FOR TANGIBLE INTERACTION AND DATA VISUALIZATION",
 			"MOVE ME AROUND TO EXPLORE MY AFFORDANCES!",
 			"STUDENTS FROM INTERACTION DESIGN USE ME TO EXPLORE THEIR CONCEPTS",
-			"DESIGN ... TECHNOLOGY ... THINKING ... CONCEIVING ...  DOING ...  "
+			"DESIGN ... TECHNOLOGY ... THINKING ... CONCEIVING ...  DOING ...  ",
+			"PROTOTYPING"
 		]
 		let peak = 10
 		
@@ -704,7 +792,7 @@ class Label{
 		textSize(16)
 		fill(255,255,100,this.opacity)
 		textAlign(CENTER,CENTER)
-		text(txtContent[int(map(this.rotation,40,360,-1,3))],offX +30 , offY - this.size/4, this.size-25, this.size/2 )
+		text(txtContent[int(map(this.rotation,1,360,-1,4))],offX +30 , offY - this.size/4, this.size-25, this.size/2 )
 		pop()
 
 	}
@@ -808,5 +896,143 @@ class CenterControl{
     	const d = target - value
     	return value + (d * alpha)
   	}
+}
+
+
+
+
+// image carousel
+function carousel(){
+	const delay = 8000 //ms
+
+	const slidesA = document.querySelector(".slides-A")
+	const slidesCountA = slidesA.childElementCount
+	const maxLeftA= (slidesCountA - 1) * 100 * -1
+	let currentA = 0
+
+	const slidesB = document.querySelector(".slides-B")
+	const slidesCountB = slidesB.childElementCount
+	const maxLeftB= (slidesCountB - 1) * 100 * -1
+	let currentB = 0
+
+	const slidesC = document.querySelector(".slides-C")
+	const slidesCountC = slidesC.childElementCount
+	const maxLeftC= (slidesCountC - 1) * 100 * -1
+	let currentC = 0
+
+	const slidesD = document.querySelector(".slides-D")
+	const slidesCountD = slidesD.childElementCount
+	const maxLeftD= (slidesCountD - 1) * 100 * -1
+	let currentD = 0
+
+
+	function changeSlideA(next = true) {
+	  if (next) {
+	    currentA += currentA > maxLeftA ? -100 : currentA * -1
+	  } else {
+	    currentA = currentA < 0 ? currentA + 100 : maxLeftA
+	  }
+
+	  slidesA.style.left = currentA + "%"
+	}
+
+	function changeSlideB(next = true) {
+	  if (next) {
+	    currentB += currentB > maxLeftB ? -100 : currentB * -1
+	  } else {
+	    currentB = currentB < 0 ? currentB + 100 : maxLeftB
+	  }
+
+	  slidesB.style.left = currentB + "%"
+	}
+
+	function changeSlideC(next = true) {
+	  if (next) {
+	    currentC += currentC > maxLeftC ? -100 : currentC * -1
+	  } else {
+	    currentC = currentC < 0 ? currentC + 100 : maxLeftC
+	  }
+
+	  slidesC.style.left = currentC + "%"
+	}
+
+	function changeSlideD(next = true) {
+	  if (next) {
+	    currentD += currentD > maxLeftD ? -100 : currentD * -1
+	  } else {
+	    currentD = currentD < 0 ? currentD + 100 : maxLeftD
+	  }
+	  slidesD.style.left = currentD + "%"
+	}
+
+	let autoChangeA = setInterval(changeSlideA, delay)
+	let autoChangeB = setInterval(changeSlideB, delay)
+	let autoChangeC = setInterval(changeSlideC, delay)
+	let autoChangeD = setInterval(changeSlideD, delay)
+
+	const restartA = function() {
+	  clearInterval(autoChangeA)
+	  autoChangeA = setInterval(changeSlideA, delay)
+	}
+
+	const restartB = function(){
+		clearInterval(autoChangeB)
+	 	autoChangeB = setInterval(changeSlideB, delay)
+	}
+
+	const restartC = function(){
+		clearInterval(autoChangeC)
+	 	autoChangeC = setInterval(changeSlideC, delay)
+	}
+
+	const restartD = function(){
+		clearInterval(autoChangeD)
+	 	autoChangeD = setInterval(changeSlideD, delay)
+	}
+
+	// ControlsA
+	document.querySelector(".next-slide-A").addEventListener("click", function() {
+	  changeSlideA()
+	  restartA()
+	})
+
+	document.querySelector(".prev-slide-A").addEventListener("click", function() {
+	  changeSlideA(false)
+	  restartA()
+	})
+	// ControlsB
+	document.querySelector(".next-slide-B").addEventListener("click", function() {
+	  changeSlideB()
+	  restartB()
+	})
+
+	document.querySelector(".prev-slide-B").addEventListener("click", function() {
+	  changeSlideB(false)
+	  restartB()
+	})
+
+	// ControlsC
+	document.querySelector(".next-slide-C").addEventListener("click", function() {
+	  changeSlideC()
+	  restartC()
+	})
+
+	document.querySelector(".prev-slide-C").addEventListener("click", function() {
+	  changeSlideC(false)
+	  restartC()
+	})
+
+	// ControlsD
+	document.querySelector(".next-slide-D").addEventListener("click", function() {
+	  changeSlideD()
+	  restartD()
+	})
+
+	document.querySelector(".prev-slide-D").addEventListener("click", function() {
+	  changeSlideD(false)
+	  restartD()
+	})
+
+
 }
 
