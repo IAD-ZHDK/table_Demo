@@ -35,6 +35,7 @@ let myFont
 let tableControl
 let bckColor = [0,0,0]
 let zurich
+let fPVector
 let cdmx
 let rMX =  0/* -161 */
 let rMY =  0/* -107 */
@@ -267,6 +268,9 @@ function setup() {
 	let lat = radians(47.3769)
 	let lon = radians(8.5417)
 
+	let fictiveProjectLatitude = radians(30.3492)
+	let fictiveProjectLongitude = radians(6.444)
+
 	let latZ = radians(47.3769)
 	let lonZ = radians(8.5417)
 
@@ -276,6 +280,11 @@ function setup() {
 	// 	x = R * cos(lat) * cos(lon)
 	// y = R * cos(lat) * sin(lon)
 	// z = R *sin(lat)
+
+	fPVector = createVector(0,0,0)
+	fPVector.x = r * Math.cos(fictiveProjectLatitude) * Math.cos(fictiveProjectLongitude )
+	fPVector.y =  r * Math.cos(fictiveProjectLatitude) * Math.sin(fictiveProjectLongitude )
+	fPVector.z = r * Math.sin(fictiveProjectLatitude)
 
 	zurich = createVector(0,0,0)
 	zurich.x = r * Math.cos(latZ) * Math.cos(lonZ )
@@ -523,6 +532,8 @@ function showMore2DPoints(){
 	let tZurich = screenPosition(-zurich.x,zurich.y,zurich.z)
 	let tCDMX = screenPosition(-cdmx.x,cdmx.y,cdmx.z)
 
+	let tFPVector = screenPosition(-fPVector.x,fPVector.y,fPVector.z)
+
 	for(let i = 0 ; i <400; i++){
 		testPoints[i] = screenPosition(-x[i], y[i], z[i])
 	}
@@ -564,8 +575,12 @@ function showMore2DPoints(){
 			circle(tZurich.x + windowWidth/4,tZurich.y + windowHeight/2,25)
 		}else{
 			circle(tZurich.x + windowWidth/4,tZurich.y + windowHeight/2,15)
-		}	
-		fill(0,0,255)
+		}
+
+		fill(0,255,100)
+		circle(tFPVector.x + windowWidth/4, tFPVector.y + windowHeight/2, 40)
+
+		fill(100,100,255)
 		circle(tCDMX.x + windowWidth/4,tCDMX.y + windowHeight/2,5)
 	easycam.endHUD()
 }
