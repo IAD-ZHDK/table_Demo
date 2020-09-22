@@ -48,14 +48,20 @@ let americaMap
 let australiaMap
 let euAsiaMap
 let africaMap
+let antarticaMap
+let ukIrMap
 let screenPointsAmerica = []
 let screenPointsEuAsia = []
 let screenPointsAfrica = []
 let screenPointsAustralia = []
+let screenPointsAntartica = []
+let screenPointsUKIr = []
 let pointsAmerica = []
 let pointsEuAsia = []
 let pointsAfrica = []
 let pointsAustralia = []
+let pointsAntartica = []
+let pointsUKIr = []
 
 
 /*  full screen */
@@ -105,7 +111,6 @@ function handleTouch(evt){
 	touchCount++
 	let touches = evt.changedTouches;
 	// console.log("touch started at : " + evt.touches[0].clientX + " , " + evt.touches[0].clientY)
-
 	touchX = evt.touches[0].clientX
 	touchY = evt.touches[0].clientY
 	
@@ -162,7 +167,8 @@ function preload() {
 	australiaMap = loadTable('assets/maps/australia.csv', '', '')
 	euAsiaMap = loadTable('assets/maps/euro-asia.csv','','')
 	africaMap = loadTable('assets/maps/africa.csv','','')
-
+	antarticaMap = loadTable('assets/maps/antartica.csv','','')
+	ukIrMap = loadTable('assets/maps/ukIr.csv','','')
 	// for (let r = 0; r < americaMap.getRowCount(); r++)
  //    for (let c = 0; c < americaMap.getColumnCount(); c++) {
  //      	console.log(americaMap.getString(r, c))
@@ -236,6 +242,8 @@ function setup() {
 	setMap(africaMap,pointsAfrica,screenPointsAfrica)
 	setMap(australiaMap,pointsAustralia,screenPointsAustralia)
 	setMap(euAsiaMap,pointsEuAsia,screenPointsEuAsia)
+	setMap(antarticaMap,pointsAntartica,screenPointsAntartica)
+	setMap(ukIrMap,pointsUKIr,screenPointsUKIr)
 	// console.log(this._renderer)
 
 	// CREATING A RANDOM ARRAY OF POINTS AROUND THE GLOBE
@@ -305,6 +313,8 @@ function draw() {
 	showMap(pointsAfrica, screenPointsAfrica ,color(255,215,255))
 	showMap(pointsEuAsia, screenPointsEuAsia ,color(215,255,255))
 	showMap(pointsAustralia, screenPointsAustralia ,color(255,215,255))
+	showMap(pointsAntartica,screenPointsAntartica,color(255,255,255))
+	showMap(pointsUKIr,screenPointsUKIr,color(255,255,255))
 	easycam.setCenter([0,0,0],0.0)
 
 
@@ -320,7 +330,7 @@ function show3D(){
  		let v1 = easycam.getPosition(500) 
 	 	pointLight(255,255, 255, v1[0], v1[1]+300, v1[2]) 
 	 	pointLight(255, 255, 255, v1[0], v1[1]+300, v1[2]) 
-	  	texture(earthImg) 
+	  	texture(earthImg)
 	  	noStroke()
 	  	// rotating earth in order to match coordinate system location
 	  	push()
@@ -538,25 +548,25 @@ function showMore2DPoints(){
 				circle(testPoints[i].x + windowWidth/4, testPoints[i].y + windowHeight/2, 3)
 			}
 		}
-	fill(255,100,100)
-	if(user.dist(tZurich)<25){
-		let lat = Math.asin(zurich.z / r)
-		let lon = Math.atan2(zurich.y,zurich.x)
-		lat = lat * 180 / PI
-		lon = lon * 180 / PI
-		textSize(16)
-		let latLon = 'ZURICH, LAT : ' + lat.toFixed(3) + ' , LON : '+ lon.toFixed(3);
-		if(mouseX>windowWidth/4){
-			text( latLon ,tZurich.x + windowWidth/4 - 240, tZurich.y + windowHeight/2 + 5 )
+		fill(255,100,100)
+		if(user.dist(tZurich)<25){
+			let lat = Math.asin(zurich.z / r)
+			let lon = Math.atan2(zurich.y,zurich.x)
+			lat = lat * 180 / PI
+			lon = lon * 180 / PI
+			textSize(16)
+			let latLon = 'ZURICH, LAT : ' + lat.toFixed(3) + ' , LON : '+ lon.toFixed(3) + ' , Z pos : ' + tZurich.z
+			if(mouseX>windowWidth/4){
+				text( latLon ,tZurich.x + windowWidth/4 - 240, tZurich.y + windowHeight/2 + 5 )
+			}else{
+				text( latLon ,tZurich.x + windowWidth/4 + 20, tZurich.y + windowHeight/2 + 5 )
+			}
+			circle(tZurich.x + windowWidth/4,tZurich.y + windowHeight/2,25)
 		}else{
-			text( latLon ,tZurich.x + windowWidth/4 + 20, tZurich.y + windowHeight/2 + 5 )
-		}
-		circle(tZurich.x + windowWidth/4,tZurich.y + windowHeight/2,25)
-	}else{
-		circle(tZurich.x + windowWidth/4,tZurich.y + windowHeight/2,15)
-	}	
-	fill(0,0,255)
-	circle(tCDMX.x + windowWidth/4,tCDMX.y + windowHeight/2,5)
+			circle(tZurich.x + windowWidth/4,tZurich.y + windowHeight/2,15)
+		}	
+		fill(0,0,255)
+		circle(tCDMX.x + windowWidth/4,tCDMX.y + windowHeight/2,5)
 	easycam.endHUD()
 }
 function mouseClicked() {
