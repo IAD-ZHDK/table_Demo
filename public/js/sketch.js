@@ -35,6 +35,7 @@ let myFont
 let tableControl
 let bckColor = [0,0,0]
 let zurich
+let fPVector
 let cdmx
 let rMX =  0/* -161 */
 let rMY =  0/* -107 */
@@ -48,14 +49,20 @@ let americaMap
 let australiaMap
 let euAsiaMap
 let africaMap
+let antarticaMap
+let ukIrMap
 let screenPointsAmerica = []
 let screenPointsEuAsia = []
 let screenPointsAfrica = []
 let screenPointsAustralia = []
+let screenPointsAntartica = []
+let screenPointsUKIr = []
 let pointsAmerica = []
 let pointsEuAsia = []
 let pointsAfrica = []
 let pointsAustralia = []
+let pointsAntartica = []
+let pointsUKIr = []
 
 
 /*  full screen */
@@ -105,7 +112,6 @@ function handleTouch(evt){
 	touchCount++
 	let touches = evt.changedTouches;
 	// console.log("touch started at : " + evt.touches[0].clientX + " , " + evt.touches[0].clientY)
-
 	touchX = evt.touches[0].clientX
 	touchY = evt.touches[0].clientY
 	
@@ -162,7 +168,8 @@ function preload() {
 	australiaMap = loadTable('assets/maps/australia.csv', '', '')
 	euAsiaMap = loadTable('assets/maps/euro-asia.csv','','')
 	africaMap = loadTable('assets/maps/africa.csv','','')
-
+	antarticaMap = loadTable('assets/maps/antartica.csv','','')
+	ukIrMap = loadTable('assets/maps/ukIr.csv','','')
 	// for (let r = 0; r < americaMap.getRowCount(); r++)
  //    for (let c = 0; c < americaMap.getColumnCount(); c++) {
  //      	console.log(americaMap.getString(r, c))
@@ -236,6 +243,8 @@ function setup() {
 	setMap(africaMap,pointsAfrica,screenPointsAfrica)
 	setMap(australiaMap,pointsAustralia,screenPointsAustralia)
 	setMap(euAsiaMap,pointsEuAsia,screenPointsEuAsia)
+	setMap(antarticaMap,pointsAntartica,screenPointsAntartica)
+	setMap(ukIrMap,pointsUKIr,screenPointsUKIr)
 	// console.log(this._renderer)
 
 	// CREATING A RANDOM ARRAY OF POINTS AROUND THE GLOBE
@@ -259,6 +268,9 @@ function setup() {
 	let lat = radians(47.3769)
 	let lon = radians(8.5417)
 
+	let fictiveProjectLatitude = radians(30.3492)
+	let fictiveProjectLongitude = radians(6.444)
+
 	let latZ = radians(47.3769)
 	let lonZ = radians(8.5417)
 
@@ -268,6 +280,11 @@ function setup() {
 	// 	x = R * cos(lat) * cos(lon)
 	// y = R * cos(lat) * sin(lon)
 	// z = R *sin(lat)
+
+	fPVector = createVector(0,0,0)
+	fPVector.x = r * Math.cos(fictiveProjectLatitude) * Math.cos(fictiveProjectLongitude )
+	fPVector.y =  r * Math.cos(fictiveProjectLatitude) * Math.sin(fictiveProjectLongitude )
+	fPVector.z = r * Math.sin(fictiveProjectLatitude)
 
 	zurich = createVector(0,0,0)
 	zurich.x = r * Math.cos(latZ) * Math.cos(lonZ )
@@ -305,6 +322,8 @@ function draw() {
 	showMap(pointsAfrica, screenPointsAfrica ,color(255,215,255))
 	showMap(pointsEuAsia, screenPointsEuAsia ,color(215,255,255))
 	showMap(pointsAustralia, screenPointsAustralia ,color(255,215,255))
+	showMap(pointsAntartica,screenPointsAntartica,color(255,255,255))
+	showMap(pointsUKIr,screenPointsUKIr,color(255,255,255))
 	easycam.setCenter([0,0,0],0.0)
 
 
@@ -320,7 +339,7 @@ function show3D(){
  		let v1 = easycam.getPosition(500) 
 	 	pointLight(255,255, 255, v1[0], v1[1]+300, v1[2]) 
 	 	pointLight(255, 255, 255, v1[0], v1[1]+300, v1[2]) 
-	  	texture(earthImg) 
+	  	texture(earthImg)
 	  	noStroke()
 	  	// rotating earth in order to match coordinate system location
 	  	push()
@@ -513,6 +532,8 @@ function showMore2DPoints(){
 	let tZurich = screenPosition(-zurich.x,zurich.y,zurich.z)
 	let tCDMX = screenPosition(-cdmx.x,cdmx.y,cdmx.z)
 
+	let tFPVector = screenPosition(-fPVector.x,fPVector.y,fPVector.z)
+
 	for(let i = 0 ; i <400; i++){
 		testPoints[i] = screenPosition(-x[i], y[i], z[i])
 	}
@@ -538,25 +559,29 @@ function showMore2DPoints(){
 				circle(testPoints[i].x + windowWidth/4, testPoints[i].y + windowHeight/2, 3)
 			}
 		}
-	fill(255,100,100)
-	if(user.dist(tZurich)<25){
-		let lat = Math.asin(zurich.z / r)
-		let lon = Math.atan2(zurich.y,zurich.x)
-		lat = lat * 180 / PI
-		lon = lon * 180 / PI
-		textSize(16)
-		let latLon = 'ZURICH, LAT : ' + lat.toFixed(3) + ' , LON : '+ lon.toFixed(3);
-		if(mouseX>windowWidth/4){
-			text( latLon ,tZurich.x + windowWidth/4 - 240, tZurich.y + windowHeight/2 + 5 )
+		fill(255,100,100)
+		if(user.dist(tZurich)<25){
+			let lat = Math.asin(zurich.z / r)
+			let lon = Math.atan2(zurich.y,zurich.x)
+			lat = lat * 180 / PI
+			lon = lon * 180 / PI
+			textSize(16)
+			let latLon = 'ZURICH, LAT : ' + lat.toFixed(3) + ' , LON : '+ lon.toFixed(3) + ' , Z pos : ' + tZurich.z
+			if(mouseX>windowWidth/4){
+				text( latLon ,tZurich.x + windowWidth/4 - 240, tZurich.y + windowHeight/2 + 5 )
+			}else{
+				text( latLon ,tZurich.x + windowWidth/4 + 20, tZurich.y + windowHeight/2 + 5 )
+			}
+			circle(tZurich.x + windowWidth/4,tZurich.y + windowHeight/2,25)
 		}else{
-			text( latLon ,tZurich.x + windowWidth/4 + 20, tZurich.y + windowHeight/2 + 5 )
+			circle(tZurich.x + windowWidth/4,tZurich.y + windowHeight/2,15)
 		}
-		circle(tZurich.x + windowWidth/4,tZurich.y + windowHeight/2,25)
-	}else{
-		circle(tZurich.x + windowWidth/4,tZurich.y + windowHeight/2,15)
-	}	
-	fill(0,0,255)
-	circle(tCDMX.x + windowWidth/4,tCDMX.y + windowHeight/2,5)
+
+		fill(0,255,100)
+		circle(tFPVector.x + windowWidth/4, tFPVector.y + windowHeight/2, 40)
+
+		fill(100,100,255)
+		circle(tCDMX.x + windowWidth/4,tCDMX.y + windowHeight/2,5)
 	easycam.endHUD()
 }
 function mouseClicked() {

@@ -204,18 +204,30 @@ function addScreenPositionFunction(p5Instance) {
 
 		} else {
 			let v = p.createVector(x, y, z);
-
+			// this v2 is to use the diametrically opposed value to see if point is behind or on front the spherical projection
+			let v2 = p.createVector(-x,-y,-z);
 			// Calculate the ModelViewProjection Matrix.
 			let mvp = (p._renderer.uMVMatrix.copy()).mult(p._renderer.uPMatrix);
 
 			// Transform the vector to Normalized Device Coordinate.
 			let vNDC = multMatrixVector(mvp, v);
+			let vNDC2 = multMatrixVector(mvp,v2);
 
 			// Transform vector from NDC to Canvas coordinates.
 			let vCanvas = p.createVector();
 			vCanvas.x = 0.5 * vNDC.x * p.width;
 			vCanvas.y = 0.5 * -vNDC.y * p.height;
-			vCanvas.z = 0;
+			// in case you prefer to ignore z set it to 0
+			// vCanvas.z = 0;
+
+
+			// to know if z in front or behind the earth / spherical projection
+			if(vNDC2.z>vNDC.z){
+				vCanvas.z = 1
+			}else{
+				vCanvas.z = -1
+			}
+			vCanvas.z = vNDC2.z-vNDC.z
 
 			return vCanvas;
 		}
